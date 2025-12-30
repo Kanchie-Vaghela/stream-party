@@ -1,6 +1,6 @@
 import "./App.css";
 import socket from "./socket";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   useEffect(() => {
@@ -21,18 +21,63 @@ function App() {
       console.log(`${username} left the room`);
     });
 
-    // cleanup 
+    socket.on("chat:message", ({ username, message }) => {
+      console.log(`${username}: ${message}`);
+    });
+
+    // cleanup
     return () => {
       socket.off("connect");
       socket.off("room:user-joined");
       socket.off("room:user-left");
+      socket.off("chat:message");
     };
   }, []);
+
+  // Fetch chat history 
+  useEffect(() => {
+    fetch(`http://localhost:3000/rooms/test-room/messages`)
+      .then((res) => res.json())
+      .then((data) => setchathistory(data));
+  }, []);
+
+  const [message, setMessage] = useState("");     // input text
+  const [chathistory, setchathistory] = useState([]);   // chat history
+
 
   return (
     <>
       <div>
         <h1>Stream Application</h1>
+      </div>
+
+      <div>
+        {chathistory.map((msg, index) => (
+          <div key={index}>
+            <strong>{msg.username}:</strong> {msg.message}
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <input
+          type="text"
+          placeholder="type your message..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button
+          onClick={() => {
+            socket.emit("chat:message", {
+              roomId: "test-room",
+              username: "kanchi",
+              message: message,
+            });
+            setMessage("");
+          }}
+        >
+          Send
+        </button>
       </div>
     </>
   );
