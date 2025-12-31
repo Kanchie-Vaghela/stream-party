@@ -76,6 +76,18 @@ io.on("connection", (socket) => {
     }
   });
 
+
+ socket.on("video:play", ({ roomId, time }) => {
+   console.log("BACKEND video:play from", socket.id);
+  socket.to(roomId).emit("video:play", { time });
+});
+
+socket.on("video:pause", ({ roomId, time }) => {
+  socket.to(roomId).emit("video:pause", { time });
+});
+
+
+
   //handle disconnect
   socket.on("disconnect", () => {
     console.log("socket disconnected:", socket.id);
