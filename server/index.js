@@ -1,5 +1,5 @@
-import dotenv from 'dotenv'; // Import dotenv
-dotenv.config(); 
+import dotenv from "dotenv"; // Import dotenv
+dotenv.config();
 import cors from "cors";
 import express from "express";
 import http from "http";
@@ -20,10 +20,11 @@ mongoose
 const app = express();
 const port = 3000;
 
-app.use(cors({
-  origin: "http://localhost:5173"
-}));
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -76,17 +77,15 @@ io.on("connection", (socket) => {
     }
   });
 
+  //video events
+  socket.on("video:play", ({ roomId, time }) => {
+    console.log("BACKEND video:play from", socket.id);
+    socket.to(roomId).emit("video:play", { time });
+  });
 
- socket.on("video:play", ({ roomId, time }) => {
-   console.log("BACKEND video:play from", socket.id);
-  socket.to(roomId).emit("video:play", { time });
-});
-
-socket.on("video:pause", ({ roomId, time }) => {
-  socket.to(roomId).emit("video:pause", { time });
-});
-
-
+  socket.on("video:pause", ({ roomId, time }) => {
+    socket.to(roomId).emit("video:pause", { time });
+  });
 
   //handle disconnect
   socket.on("disconnect", () => {
