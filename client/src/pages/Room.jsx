@@ -70,7 +70,7 @@ const Room = () => {
 
   // Fetch chat history
   useEffect(() => {
-    fetch(`http://localhost:3000/rooms/${roomId}/messages`)
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/rooms/${roomId}/messages`)
       .then((res) => res.json())
       .then((data) => setchathistory(data));
   }, [roomId]);
