@@ -1,11 +1,13 @@
 import socket from "../socket";
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 const Room = () => {
   let isSyncing = false;
   const isSyncingRef = useRef(false);
   const { roomId } = useParams();
+  const location = useLocation();
+  const username = location.state?.username || "anonymous";
 
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [videoId, setVideoId] = useState("dQw4w9WgXcQ"); // default
@@ -149,49 +151,92 @@ const Room = () => {
 
   return (
     <>
-      <div>
-        <h1>Stream Application</h1>
+      {/* header */}
+      <div className="px-8 py-6 bg-black border-b border-white/10">
+        <h1 className="text-2xl tracking-[0.4em]  font-light uppercase text-white/90">
+          Stream Application
+        </h1>
       </div>
 
-      {/* chat history display */}
-      <div>
-        {chathistory.map((msg, index) => (
-          <div key={index}>
-            <strong>{msg.username}:</strong> {msg.message}
+      {/* main layout */}
+      <div className="grid grid-cols-3 gap-6 px-8 py-6 min-h-[calc(100vh-80px)] bg-black text-white">
+        {/* video panel */}
+        <div className="col-span-2 flex flex-col border border-white/10">
+          {/* video controls */}
+          <div className="p-4 border-b border-white/10 flex gap-4">
+            <input
+              placeholder="PASTE YOUTUBE LINK"
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              className="flex-1 bg-transparent border-b border-white/20 
+                     px-2 py-2 text-sm tracking-widest uppercase
+                     placeholder-white/30 focus:outline-none 
+                     focus:border-cyan-400 transition-colors"
+            />
+            <button
+              onClick={handleLoadVideo}
+              className="px-6 py-2 border border-white/20
+                     text-xs tracking-[0.3em] uppercase
+                     hover:border-cyan-400 hover:text-cyan-400
+                     transition-all"
+            >
+              Load
+            </button>
           </div>
-        ))}
-      </div>
 
-      {/* message input and send button */}
-      <div>
-        <input
-          type="text"
-          placeholder="type your message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button
-          onClick={() => {
-            socket.emit("chat:message", {
-              roomId: roomId,
-              username: "kanchi",
-              message: message,
-            });
-            setMessage("");
-          }}
-        >
-          Send
-        </button>
-      </div>
+          {/* video player */}
+          <div className="flex-1 flex items-center justify-center bg-black">
+            <div id="player" />
+          </div>
+        </div>
 
-      {/* video stream */}
-      <input
-        placeholder="Paste YouTube link"
-        value={youtubeUrl}
-        onChange={(e) => setYoutubeUrl(e.target.value)}
-      />
-      <button onClick={handleLoadVideo}>Load</button>
-      <div id="player"></div>
+
+        {/* chat panel */}
+        <div className="col-span-1 flex flex-col border border-white/10">
+
+          {/* chat history */}
+          <div className="flex-1 p-4 space-y-3 overflow-y-auto text-sm">
+            {chathistory.map((msg, index) => (
+              <div key={index} className="text-white/80">
+                <span className="text-cyan-400 tracking-wide">
+                  {msg.username}
+                </span>
+                <span className="ml-2">{msg.message}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* message input */}
+          <div className="border-t border-white/10 p-4 flex gap-3">
+            <input
+              type="text"
+              placeholder="TYPE MESSAGE"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="flex-1 bg-transparent border-b border-white/20 
+                     px-2 py-2 text-sm tracking-widest uppercase
+                     placeholder-white/30 focus:outline-none 
+                     focus:border-cyan-400 transition-colors"
+            />
+            <button
+              onClick={() => {
+                socket.emit("chat:message", {
+                  roomId: roomId,
+                  username: username,
+                  message: message,
+                });
+                setMessage("");
+              }}
+              className="px-4 py-2 border border-white/20
+                     text-xs tracking-[0.3em] uppercase
+                     hover:border-cyan-400 hover:text-cyan-400
+                     transition-all"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
