@@ -87,6 +87,10 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("video:pause", { time });
   });
 
+  socket.on("video:change", ({ roomId, videoId }) => {
+    socket.to(roomId).emit("video:change", { videoId });
+  });
+
   //handle disconnect
   socket.on("disconnect", () => {
     console.log("socket disconnected:", socket.id);
