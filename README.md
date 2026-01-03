@@ -10,6 +10,8 @@ This project was built from scratch to understand how real-time systems work in
 production — especially how REST APIs, WebSockets, and frontend state interact.
 </p>
 
+<p>link: https://stream-party-9wvt.vercel.app/</p>
+
 <br/>
 
 <h2>🚀 What this app does</h2>
